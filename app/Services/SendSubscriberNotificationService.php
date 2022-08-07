@@ -3,12 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\SendSubscriberNotificationContract;
-use App\Events\SubscriberEvent;
 use App\Events\SubscriberPostEvent;
 use App\Models\PostUser;
 use App\Models\User;
-use App\Models\Website;
-use App\Notifications\PostPublishedNotification;
 
 class SendSubscriberNotificationService implements SendSubscriberNotificationContract
 {
@@ -21,7 +18,8 @@ class SendSubscriberNotificationService implements SendSubscriberNotificationCon
 
     public function setSubscribers()
     {
-        $subscribers = User::with(['websites.posts'])->get();
+        $subscribers = User::with(['websites.posts'])
+            ->get();
 
         foreach($subscribers as $subscriber)
         {
@@ -48,7 +46,7 @@ class SendSubscriberNotificationService implements SendSubscriberNotificationCon
 
     public function sendNotification()
     {
-        
+
        foreach($this->subscribers as $subscriber)
        {
             SubscriberPostEvent::dispatch($subscriber);

@@ -3,10 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Contracts\SendSubscriberNotificationContract;
-use App\Models\Post;
-use App\Models\User;
-use App\Models\Website;
-use App\Notifications\PostPublishedNotification;
 use Illuminate\Console\Command;
 
 class SendNotificationToUsersCommand extends Command

@@ -5,8 +5,6 @@ namespace App\Listeners;
 use App\Events\SubscriberPostEvent;
 use App\Models\PostUser;
 use App\Notifications\PostPublishedNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class SubscriberPostNotificationListener
 {
@@ -30,7 +28,6 @@ class SubscriberPostNotificationListener
     {
 
         $subscriber = $event->subscriber;
-        // dump(count($subscriber->websites));
         foreach($subscriber->websites as $website)
         {
             foreach($website->posts as $post)

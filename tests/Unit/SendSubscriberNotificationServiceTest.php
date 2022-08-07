@@ -4,17 +4,16 @@ namespace Tests\Unit;
 
 use App\Contracts\SendSubscriberNotificationContract;
 use App\Events\SubscriberPostEvent;
+use App\Listeners\SubscriberPostNotificationListener;
 use App\Models\Post;
 use App\Models\PostUser;
 use App\Models\User;
 use App\Models\Website;
 use App\Notifications\PostPublishedNotification;
-use App\Services\SendSubscriberNotificationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
-// use PHPUnit\Framework\TestCase;
 use Tests\CreatesApplication;
 use Tests\TestCase;
 
@@ -56,8 +55,9 @@ class SendSubscriberNotificationServiceTest extends TestCase
     /**
      @test
      */
-    public function it_can_send_notification_to_user()
+    public function it_can_send_notification_to_user_who_subscribe_the_website()
     {
+        $userTest = User::factory()->create();
         $user = User::factory()->create();
         $website = Website::factory()->create();
         $post = Post::factory()->create([
@@ -70,6 +70,7 @@ class SendSubscriberNotificationServiceTest extends TestCase
         $contract->sendNotification();
 
         Notification::assertSentTo($user, PostPublishedNotification::class);
+        Notification::assertNothingSentTo($userTest, PostPublishedNotification::class);
     }
 
     /**
@@ -100,6 +101,7 @@ class SendSubscriberNotificationServiceTest extends TestCase
         $contract->sendNotification();
 
         Event::assertDispatched(SubscriberPostEvent::class);
+        Event::assertListening(SubscriberPostEvent::class, SubscriberPostNotificationListener::class);
 
     }
 
@@ -129,6 +131,35 @@ class SendSubscriberNotificationServiceTest extends TestCase
         Notification::fake();
         $contract = app(SendSubscriberNotificationContract::class);
         $contract->sendNotification();
+
+        Notification::assertSentTo($user, PostPublishedNotification::class);
+        Notification::assertCount(1);
+
+    }
+
+    /**
+     @test
+     */
+    public function it_can_updates_post_users_table_if_notification_sent()
+    {
+        $user = User::factory()->create();
+        $website = Website::factory()->create();
+
+        $post = Post::factory()->create([
+            'website_id' => $website->id
+        ]);
+
+
+        $website->subscribers()->attach($user->id);
+
+        Notification::fake();
+        $contract = app(SendSubscriberNotificationContract::class);
+        $contract->sendNotification();
+
+        $this->assertDatabaseHas('post_users',[
+            'post_id' => $post->id,
+            'user_id' => $user->id
+        ]);
 
         Notification::assertSentTo($user, PostPublishedNotification::class);
         Notification::assertCount(1);
