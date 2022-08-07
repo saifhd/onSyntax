@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Contracts\SendSubscriberNotificationContract;
+use App\Services\SendSubscriberNotificationService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(SendSubscriberNotificationContract::class, function ($app) {
+            return new SendSubscriberNotificationService();
+        });
     }
 
     /**
@@ -23,6 +27,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+
     }
 }
