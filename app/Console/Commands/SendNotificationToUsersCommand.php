@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Contracts\SendSubscriberNotificationContract;
+use App\Jobs\SubscriberNotificationJob;
 use Illuminate\Console\Command;
 
 class SendNotificationToUsersCommand extends Command
@@ -26,8 +26,8 @@ class SendNotificationToUsersCommand extends Command
      *
      * @return int
      */
-    public function handle(SendSubscriberNotificationContract $contract)
+    public function handle()
     {
-        $contract->sendNotification();
+        SubscriberNotificationJob::dispatch();
     }
 }

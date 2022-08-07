@@ -12,7 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SubscriberPostEvent implements ShouldQueue
+class SubscriberPostEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
