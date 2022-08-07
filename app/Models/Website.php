@@ -9,6 +9,8 @@ class Website extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function subscribers()
     {
         return $this->belongsToMany(User::class);

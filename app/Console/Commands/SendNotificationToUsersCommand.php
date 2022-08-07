@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Contracts\SendSubscriberNotificationContract;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Website;
@@ -29,19 +30,8 @@ class SendNotificationToUsersCommand extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(SendSubscriberNotificationContract $contract)
     {
-        $subscribers = User::with('websites.posts')->get();
-
-        foreach($subscribers as $subscriber)
-        {
-            foreach($subscriber->websites as $website)
-            {
-                foreach($website->posts as $post)
-                {
-                    $subscriber->notify(new PostPublishedNotification($post));
-                }
-            }
-        }
+        $contract->sendNotification();
     }
 }

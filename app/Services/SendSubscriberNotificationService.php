@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Contracts\SendSubscriberNotificationContract;
 use App\Events\SubscriberEvent;
+use App\Events\SubscriberPostEvent;
 use App\Models\PostUser;
 use App\Models\User;
 use App\Models\Website;
+use App\Notifications\PostPublishedNotification;
 
 class SendSubscriberNotificationService implements SendSubscriberNotificationContract
 {
@@ -27,7 +29,7 @@ class SendSubscriberNotificationService implements SendSubscriberNotificationCon
             {
                 $notificationSentPosts = PostUser::select('post_id')
                     ->where('user_id', $subscriber->id)
-                    ->pluck('id')
+                    ->pluck('post_id')
                     ->toArray();
                 $posts = $website->posts;
                 $posts = $posts->whereNotIn('id', $notificationSentPosts);
@@ -41,11 +43,16 @@ class SendSubscriberNotificationService implements SendSubscriberNotificationCon
     public function getSubscribers()
     {
         return $this->subscribers;
+
     }
 
     public function sendNotification()
     {
-       
+        
+       foreach($this->subscribers as $subscriber)
+       {
+            SubscriberPostEvent::dispatch($subscriber);
+       }
     }
 
 }
